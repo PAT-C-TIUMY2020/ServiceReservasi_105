@@ -15,6 +15,125 @@ namespace ServiceReservasi
         SqlConnection connection;
         SqlCommand com; //untuk mengkoneksikan database ke visual studio
 
+        public string Login(string username, string password)
+        {
+            string kategori = "";
+
+            string sql = "select Kategori from Login where Username = '" + username + "' and Password = '" + password + "'";
+            connection = new SqlConnection(constring);
+            com = new SqlCommand(sql, connection);
+            connection.Open();
+            SqlDataReader reader = com.ExecuteReader();
+            while (reader.Read())
+            {
+                kategori = reader.GetString(0);
+            }
+
+            return kategori;
+        }
+
+        public string Register(string username, string password, string kategori)
+        {
+            try
+            {
+                string sql = "insert into Login values('" + username + "', '" + password + "', '" + kategori + "')";
+                connection = new SqlConnection(constring);
+                com = new SqlCommand(sql, connection);
+                connection.Open();
+                com.ExecuteNonQuery();
+                connection.Close();
+
+                return "Sukses";
+            }
+
+            catch (Exception e)
+            {
+                return e.ToString();
+            }
+        }
+
+        public string UpdateRegister(string username, string password, string kategori, int id)
+        {
+            try
+            {
+                string sql2 = "update Login SET username = '" + username + "', Password = '" + password + "', Kategori = '" + username + "' where ID_Login = '" + id + "'";
+                connection = new SqlConnection(constring);
+                com = new SqlCommand(sql2, connection);
+                connection.Open();
+                com.ExecuteNonQuery();
+                connection.Close();
+
+                return "Sukses";
+            }
+
+            catch (Exception e)
+            {
+                return e.ToString();
+            }
+        }
+
+        public string DeleteRegister(string username)
+        {
+            try
+            {
+                int id = 0;
+                string sql = "select ID_Login from dbo.Login where Username = '" + username + "'";
+                connection = new SqlConnection(constring);
+                com = new SqlCommand(sql, connection);
+                connection.Open();
+                SqlDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    id = reader.GetInt32(0);
+                }
+
+                connection.Close();
+                string sql2 = "delete from Login where ID_Login '" + id + "'";
+                com = new SqlCommand(sql, connection);
+                connection.Open();
+                com.ExecuteNonQuery();
+                connection.Close();
+
+                return "Sukses";
+            }
+
+            catch (Exception e)
+            {
+                return e.ToString();
+            }
+        }
+
+        public List<DataRegister> DataRegist()
+        {
+            List<DataRegister> list = new List<DataRegister>();
+            try
+            {
+                string sql = "select ID_Login, Username, Password, Kategori from Login";
+                connection = new SqlConnection(constring);
+                com = new SqlCommand(sql, connection);
+                connection.Open();
+                SqlDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    DataRegister data = new DataRegister();
+                    data.id = reader.GetInt32(0);
+                    data.username = reader.GetString(1);
+                    data.password = reader.GetString(2);
+                    data.kategori = reader.GetString(3);
+                    list.Add(data);
+                }
+
+                connection.Close();
+            }
+
+            catch (Exception e)
+            {
+                e.ToString();
+            }
+
+            return list;
+        }
+
         public string deletePemesanan(string IDPemesanan)
         {
             string a = "gagal";
@@ -120,7 +239,7 @@ namespace ServiceReservasi
                     Pemesanan data = new Pemesanan();
                     data.IDPemesanan = reader.GetString(0);
                     data.NamaCustomer = reader.GetString(1);
-                    data.NoTelpon = reader.GetString(2);
+                    data.NoTelepon = reader.GetString(2);
                     data.JumlahPemesanan = reader.GetInt32(3);
                     data.Lokasi = reader.GetString(4);
                     pemesanans.Add(data);
